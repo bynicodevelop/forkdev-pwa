@@ -1,4 +1,4 @@
-export default function async({ store, route, redirect, $cookies }) {
+export default function async({ store, route, redirect, $cookies, app }) {
   console.log('Auth middleware')
 
   const user = $cookies.get('forkdev')

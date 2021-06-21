@@ -2,7 +2,7 @@
   "functions": {
     "source": "functions",
     "predeploy": [
-      "npm run build && rm -rf functions/nuxt && cp -r .nuxt/ functions/nuxt/ && cp nuxt.config.js functions/"
+      "rm -rf functions/node_modules && rm -rf node_modules && rm -rf functions/.nuxt && rm .env && rm functions/.env functions/nuxt.config.js && cp .env-prod .env && npm i && npm run build && npm --prefix functions/ i && mkdir -p functions/.nuxt/dist && cp -r .nuxt/dist/ functions/.nuxt/dist && cp nuxt.config.js functions/ && cp .env functions/.env"
     ]
   },
   "firestore": {
@@ -11,7 +11,7 @@
   },
   "hosting": {
     "predeploy": [
-      "rm -rf public/* && mkdir -p public/_nuxt && cp -r .nuxt/dist/client/ public/_nuxt && cp -a static/. public/"
+      "rm -rf public/* && mkdir -p public/nuxt && cp -r functions/.nuxt/dist/client/ public/nuxt && cp -a static/. public/"
     ],
     "public": "public",
     "ignore": [
@@ -22,7 +22,7 @@
     "rewrites": [
       {
         "source": "**",
-        "function": "ssrapp"
+        "function": "app"
       }
     ]
   },

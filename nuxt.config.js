@@ -1,7 +1,12 @@
-import colors from 'vuetify/es5/util/colors'
+// import colors from 'vuetify/es5/util/colors'
 
 // export default {
+// const colors = require('vuetify/es5/util/colors').default
+console.log(process.env.NODE_ENV)
+
 module.exports = {
+  mode: 'universal',
+
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
     titleTemplate: '%s - forkdev',
@@ -54,30 +59,48 @@ module.exports = {
     },
     services: {
       auth: {
-        persistence: 'session', // default
+        persistence: 'local', // default
         initialize: {
           // onAuthStateChangedMutation: 'ON_AUTH_STATE_CHANGED_MUTATION',
           onAuthStateChangedAction: 'onAuthStateChangedAction',
           // subscribeManually: false,
         },
-        ssr: false, // default
-        emulatorPort: 9099,
-        emulatorHost: 'http://localhost',
+        ssr: true, // default
+        emulatorPort: process.env.NODE_ENV === 'development' ? 9099 : null,
+        emulatorHost:
+          process.env.NODE_ENV === 'development' ? 'http://localhost' : null,
         disableEmulatorWarnings: true,
       },
-      firestore: {
-        emulatorPort: 8080,
-        emulatorHost: 'localhost',
-      },
-      storage: {
-        emulatorPort: 9199,
-        emulatorHost: 'localhost',
-      },
+      firestore:
+        process.env.NODE_ENV === 'development'
+          ? {
+              emulatorPort: 8080,
+              emulatorHost: 'localhost',
+            }
+          : {},
+      storage:
+        process.env.NODE_ENV === 'development'
+          ? {
+              emulatorPort: 9199,
+              emulatorHost: 'localhost',
+            }
+          : {},
     },
   },
 
   // PWA module configuration: https://go.nuxtjs.dev/pwa
   pwa: {
+    meta: false,
+    icon: false,
+
+    workbox: {
+      autoRegister: true,
+      importScripts: ['/firebase-auth-sw.js'],
+      // by default the workbox module will not install the service worker in dev environment to avoid conflicts with HMR
+      // only set this true for testing and remember to always clear your browser cache in development
+      dev: process.env.NODE_ENV === 'development',
+    },
+
     manifest: {
       lang: 'en',
     },
@@ -106,15 +129,15 @@ module.exports = {
     theme: {
       dark: false,
       themes: {
-        dark: {
-          primary: colors.blue.darken2,
-          accent: colors.grey.darken3,
-          secondary: colors.amber.darken3,
-          info: colors.teal.lighten1,
-          warning: colors.amber.base,
-          error: colors.deepOrange.accent4,
-          success: colors.green.accent3,
-        },
+        // dark: {
+        //   primary: colors.blue.darken2,
+        //   accent: colors.grey.darken3,
+        //   secondary: colors.amber.darken3,
+        //   info: colors.teal.lighten1,
+        //   warning: colors.amber.base,
+        //   error: colors.deepOrange.accent4,
+        //   success: colors.green.accent3,
+        // },
       },
     },
   },
@@ -125,18 +148,6 @@ module.exports = {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
-    extractCss: true,
-    babel: {
-      presets: ({ isServer }) => [
-        [
-          '@nuxt/babel-preset-app',
-          {
-            targets: isServer
-              ? { node: '10.21.0' }
-              : { browsers: ['defaults'] },
-          },
-        ],
-      ],
-    },
+    extractCSS: true,
   },
 }

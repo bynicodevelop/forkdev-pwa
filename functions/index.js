@@ -7,18 +7,33 @@ const _ = require('lodash')
 
 const { Nuxt } = require('nuxt-start')
 
-// const nuxtConfig = require('./nuxt.config.js')
-
-// const config = {
-//   ...nuxtConfig,
-//   dev: false,
-//   debug: false,
-//   buildDir: 'nuxt',
-// }
-
-// const nuxt = new Nuxt(config)
+const nuxtConfig = require('./nuxt.config.js')
 
 admin.initializeApp()
+
+const config = {
+  ...nuxtConfig,
+  dev: false,
+  debug: true,
+  buildDir: '.nuxt',
+  publicPath: 'public',
+}
+
+const nuxt = new Nuxt(config)
+
+let isReady = false
+
+exports.app = functions.https.onRequest(async (req, res) => {
+  if (!isReady) {
+    try {
+      isReady = await nuxt.ready()
+    } catch (error) {
+      process.exit(1)
+    }
+  }
+
+  await nuxt.render(req, res)
+})
 
 const dataset = [
   {
@@ -58,7 +73,7 @@ const dataset = [
   },
 ]
 
-// curl http://localhost:5001/forkdev-development/us-central1/populate
+// curl http://localhost:5001/forkdev-production/us-central1/populate
 exports.populate = functions.https.onRequest(async (request, response) => {
   dataset.forEach(async (data) => {
     const { uid, email, password, displayName, posts } = data
@@ -86,13 +101,8 @@ exports.populate = functions.https.onRequest(async (request, response) => {
   response.json('ok')
 })
 
-exports.ssrapp = functions.https.onRequest(async (req, res) => {
-  await nuxt.ready()
-  nuxt.render(req, res)
-})
-
 exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
-  const { email, uid, displayName } = user
+  const { email, uid, displayName, photoURL } = user
 
   let slug = slugify(displayName.toLowerCase())
 
@@ -106,13 +116,18 @@ exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
     slug = `${slug}-${listUserRef.docs.length}`
   }
 
-  await admin.firestore().collection('users').doc(uid).set({
-    email,
-    displayName,
-    slug,
-    followings: [],
-    followers: [],
-  })
+  await admin
+    .firestore()
+    .collection('users')
+    .doc(uid)
+    .set({
+      email,
+      displayName,
+      slug,
+      photoUrl: photoURL ?? '',
+      followings: [],
+      followers: [],
+    })
 })
 
 exports.onUserFollow = functions.firestore

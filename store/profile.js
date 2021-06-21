@@ -59,10 +59,30 @@ export const actions = {
       throw new Error('User not found')
     }
 
-    const { displayName, slug, photoUrl } = ref.docs[0].data()
+    const {
+      displayName,
+      slug,
+      photoUrl,
+      bio,
+      linkedin,
+      github,
+      instagram,
+      youtube,
+    } = ref.docs[0].data()
 
-    commit('SET_PROFILE', { displayName, slug, photoUrl, id: ref.docs[0].id })
+    commit('SET_PROFILE', {
+      displayName,
+      slug,
+      photoUrl: photoUrl ?? '',
+      id: ref.docs[0].id,
+      bio: bio ?? '',
+      linkedin: linkedin ?? '',
+      github: github ?? '',
+      instagram: instagram ?? '',
+      youtube: youtube ?? '',
+    })
   },
+
   async follow({ rootState, dispatch }, options) {
     const { id } = options.profile
     const { uid, followings } = rootState.auth.user
@@ -100,6 +120,7 @@ export const actions = {
       console.log(error)
     }
   },
+
   async isFollowed({ commit, rootState }, options) {
     const { id } = options.profile
     const { followings } = rootState.auth.user

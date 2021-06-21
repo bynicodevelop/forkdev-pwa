@@ -7,11 +7,11 @@
           Suivez vos développeurs préférées et découvrez des contenus exclusifs.
         </p>
         <p>
-          ForkDev est une application pensé par des développeurs pour les
+          ForkDev est une application pensée par des développeurs pour les
           développeurs.
         </p>
       </v-col>
-      <v-col class="blue lighten-4 pt-15 px-10" md="5" align="center">
+      <v-col class="blue lighten-4 pt-15 px-10" md="4" align="center">
         <h2>Connectez-vous</h2>
         <h3 class="mb-10">Avec votre compte Github</h3>
         <div align="center">

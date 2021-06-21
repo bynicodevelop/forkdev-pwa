@@ -5,6 +5,14 @@
         :to="{ name: 'index' }"
         class="text-decoration-none black--text"
       >
+        <v-avatar color="primary" class="mr-3" size="30">
+          <img src="/icon.png" alt="ForkDev" />
+        </v-avatar>
+      </nuxt-link>
+      <nuxt-link
+        :to="{ name: 'index' }"
+        class="text-decoration-none black--text"
+      >
         <v-toolbar-title v-text="title" />
       </nuxt-link>
       <v-spacer />
@@ -50,7 +58,7 @@ export default {
   data() {
     return {
       fixed: false,
-      title: 'Vuetify.js',
+      title: 'ForkDev',
     }
   },
   computed: {

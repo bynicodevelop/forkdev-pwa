@@ -23,6 +23,8 @@
       </v-row>
       <v-row>
         <v-col>
+          <h4 class="mb-5">Vos informations personnelles</h4>
+
           <v-text-field
             label="Votre nom de profile"
             solo
@@ -33,6 +35,45 @@
             label="Votre nom de profile"
             solo
             v-model="profile.email"
+          />
+
+          <v-textarea
+            solo
+            label="Bio"
+            v-model="profile.bio"
+            counter="250"
+          ></v-textarea>
+
+          <v-divider class="my-5"></v-divider>
+
+          <h4 class="mb-5">Vos réseaux sociaux</h4>
+
+          <v-text-field
+            prepend-inner-icon="mdi-linkedin"
+            label="Profil sur Linkedin"
+            solo
+            v-model="profile.linkedin"
+          />
+
+          <v-text-field
+            prepend-inner-icon="mdi-github"
+            label="Profil sur Github"
+            solo
+            v-model="profile.github"
+          />
+
+          <v-text-field
+            prepend-inner-icon="mdi-instagram"
+            label="Profil sur Instagram"
+            solo
+            v-model="profile.instagram"
+          />
+
+          <v-text-field
+            prepend-inner-icon="mdi-youtube"
+            label="Profil sur YouTube"
+            solo
+            v-model="profile.youtube"
           />
 
           <v-btn color="success" class="mr-4" @click="save"> Validate </v-btn>

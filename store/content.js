@@ -30,6 +30,8 @@ export const mutations = {
 
 export const actions = {
   async get({ commit, rootState }, options) {
+    let posts = []
+
     const userIds = [
       ...rootState.auth.user.followings,
       ...[rootState.auth.user.uid],
@@ -42,25 +44,27 @@ export const actions = {
         .where('userId', 'in', userIds)
         .get()
 
-      const posts = await Promise.all(
-        postsRef.docs.map(async (post) => {
-          const { userId } = post.data()
+      if (postsRef.docs.length > 0) {
+        posts = await Promise.all(
+          postsRef.docs.map(async (post) => {
+            const { userId } = post.data()
 
-          const userRef = await this.$fire.firestore
-            .collection('users')
-            .doc(userId)
-            .get()
+            const userRef = await this.$fire.firestore
+              .collection('users')
+              .doc(userId)
+              .get()
 
-          return {
-            id: post.id,
-            profile: {
-              id: userRef.id,
-              ...userRef.data(),
-            },
-            ...post.data(),
-          }
-        })
-      )
+            return {
+              id: post.id,
+              profile: {
+                id: userRef.id,
+                ...userRef.data(),
+              },
+              ...post.data(),
+            }
+          })
+        )
+      }
 
       commit('SET_CONTENTS', posts)
     } catch (error) {

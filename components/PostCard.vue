@@ -7,17 +7,33 @@
 
     <v-card-title v-if="$store.state.loaded">
       <v-list-item two-line>
-        <v-list-item-avatar color="primary darken-3">
-          <v-img
-            class="elevation-6"
-            :alt="value.profile.displayName"
-            :src="value.profile.photoUrl"
-          ></v-img>
-        </v-list-item-avatar>
+        <nuxt-link
+          :to="{
+            name: 'profiles-slug',
+            params: { slug: `@${value.profile.slug}` },
+          }"
+        >
+          <v-list-item-avatar color="primary darken-3">
+            <v-img
+              class="elevation-6"
+              :alt="value.profile.displayName"
+              :src="value.profile.photoUrl"
+            ></v-img>
+          </v-list-item-avatar>
+        </nuxt-link>
+
         <v-list-item-content>
-          <v-list-item-title class="text-h5">
-            {{ value.profile.displayName }}
-          </v-list-item-title>
+          <nuxt-link
+            class="text-decoration-none black--text"
+            :to="{
+              name: 'profiles-slug',
+              params: { slug: `@${value.profile.slug}` },
+            }"
+          >
+            <v-list-item-title class="text-h5">
+              {{ value.profile.displayName }}
+            </v-list-item-title>
+          </nuxt-link>
           <v-list-item-subtitle v-if="value.createdAt != null">
             {{ $dayjs.unix(value.createdAt.seconds).fromNow() }}
           </v-list-item-subtitle>

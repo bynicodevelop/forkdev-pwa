@@ -37,24 +37,27 @@ export const actions = {
     try {
       const currentUser = await this.$fire.auth.signInWithPopup(provider)
 
-      const { email, uid } = currentUser.user
+      const { email, uid, photoURL } = currentUser.user
 
-      dispatch('setUser', { email, uid })
+      dispatch('setUser', { email, uid, photoUrl: photoURL ?? '' })
     } catch (error) {
       throw new Error(error.message)
     }
   },
-  async logout({ dispatch }) {
+
+  async logout({}) {
     await this.$fire.auth.signOut()
 
     this.$cookies.remove('forkdev')
 
     console.log('Logout - reset user...')
-    dispatch(AUTH.RESET_USER)
+    this.dispatch(AUTH.RESET_USER)
   },
+
   resetUser({ commit }) {
     commit('RESET_USER')
   },
+
   setUser({ commit, state }, data) {
     const user = {
       ...{
@@ -62,7 +65,12 @@ export const actions = {
         email: null,
         photoUrl: null,
         displayName: null,
+        bio: null,
         followings: [],
+        linkedin: null,
+        github: null,
+        instagram: null,
+        youtube: null,
       },
       ...state.user,
       ...data,
@@ -72,6 +80,7 @@ export const actions = {
 
     this.$cookies.set('forkdev', user)
   },
+
   async updateAvatar({ state }, data) {
     const { file } = data
 
@@ -90,19 +99,33 @@ export const actions = {
   },
 
   async updateProfile({ state }, data) {
-    const { email, displayName } = data
+    const { email, displayName, bio, linkedin, github, instagram, youtube } =
+      data
 
     try {
       const user = this.$fire.auth.currentUser
 
       await user.updateProfile({ email, displayName })
 
-      await this.$fire.firestore
-        .collection('users')
-        .doc(user.uid)
-        .update({ email, displayName })
+      await this.$fire.firestore.collection('users').doc(user.uid).update({
+        email,
+        displayName,
+        bio,
+        linkedin,
+        github,
+        instagram,
+        youtube,
+      })
 
-      this.dispatch(AUTH.SET_USER, { email, displayName })
+      this.dispatch(AUTH.SET_USER, {
+        email,
+        displayName,
+        bio,
+        linkedin,
+        github,
+        instagram,
+        youtube,
+      })
     } catch (error) {
       throw new Error(error.message)
     }

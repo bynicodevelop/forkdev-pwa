@@ -13,12 +13,20 @@ export const mutations = {
 }
 
 export const actions = {
-  async nuxtServerInit({ dispatch }) {
+  async nuxtServerInit({ dispatch }, { res }) {
+    console.log(res.locals)
     console.log('nuxtServerInit : Start')
-    const { uid, email, displayName, followings } =
+
+    const { uid, email, displayName, followings, photoUrl } =
       this.$cookies.get('forkdev') ?? {}
 
-    await dispatch(AUTH.SET_USER, { uid, email, displayName, followings })
+    await dispatch(AUTH.SET_USER, {
+      uid,
+      email,
+      displayName,
+      followings,
+      photoUrl,
+    })
   },
   async onAuthStateChangedAction({ commit }, { authUser, claims }) {
     if (!authUser) {
@@ -32,11 +40,29 @@ export const actions = {
       .doc(uid)
       .get()
 
-    const { photoUrl, displayName, followings } = userRef.data()
+    const {
+      photoUrl,
+      displayName,
+      followings,
+      bio,
+      linkedin,
+      github,
+      instagram,
+      youtube,
+    } = userRef.data()
 
     const user = {
       ...{ email, uid },
-      ...{ photoUrl, displayName, followings: followings ?? [] },
+      ...{
+        photoUrl: photoUrl ?? '',
+        bio: bio ?? '',
+        displayName,
+        followings: followings ?? [],
+        linkedin: linkedin ?? '',
+        github: github ?? '',
+        instagram: instagram ?? '',
+        youtube: youtube ?? '',
+      },
     }
 
     this.dispatch(AUTH.SET_USER, user)

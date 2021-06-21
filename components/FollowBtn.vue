@@ -1,5 +1,5 @@
 <template>
-  <v-btn color="primary" @click="follow">
+  <v-btn v-if="user.uid != profile.id" color="primary" @click="follow">
     <v-icon class="mr-3">mdi-source-fork mdi-rotate-90</v-icon>
     {{ isFollow ? 'Ne plus suivre' : 'Suivre' }}
   </v-btn>
@@ -7,6 +7,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { AUTH_GETTERS } from '~/store/auth'
 import { PROFILE, PROFILE_GETTERS } from '~/store/profile'
 
 export default {
@@ -19,6 +20,7 @@ export default {
   computed: {
     ...mapGetters({
       isFollow: PROFILE_GETTERS.IS_FOLLOWED,
+      user: AUTH_GETTERS.GET_USER,
     }),
   },
   mounted() {
