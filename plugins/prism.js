@@ -13,6 +13,10 @@ import 'prismjs/plugins/copy-to-clipboard/prism-copy-to-clipboard'
 // Include additional languages
 import 'prismjs/components/prism-dart.js'
 import 'prismjs/components/prism-javascript.js'
+import 'prismjs/components/prism-java.js'
+import 'prismjs/components/prism-c.js'
+import 'prismjs/components/prism-cpp.js'
+import 'prismjs/components/prism-csharp.js'
 import 'prismjs/components/prism-css.js'
 
 // Set vue SFC to markdown

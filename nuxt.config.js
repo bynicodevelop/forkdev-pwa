@@ -2,7 +2,6 @@
 
 // export default {
 // const colors = require('vuetify/es5/util/colors').default
-console.log(process.env.NODE_ENV)
 
 module.exports = {
   mode: 'universal',

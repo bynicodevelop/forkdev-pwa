@@ -97,3 +97,4 @@ public/firebase-auth-sw.js
 static/firebase-auth-sw.js
 public/nuxt
 functions/nuxt.config.js
+public/README.md
