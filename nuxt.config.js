@@ -4,10 +4,11 @@
 // const colors = require('vuetify/es5/util/colors').default
 
 module.exports = {
-  mode: 'universal',
-
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
+    htmlAttrs: {
+      lang: 'en',
+    },
     titleTemplate: '%s - forkdev',
     title: 'forkdev',
     meta: [
@@ -34,6 +35,7 @@ module.exports = {
   buildModules: [
     // https://go.nuxtjs.dev/vuetify
     '@nuxtjs/vuetify',
+    '@nuxtjs/html-validator',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
@@ -64,7 +66,10 @@ module.exports = {
           onAuthStateChangedAction: 'onAuthStateChangedAction',
           // subscribeManually: false,
         },
-        ssr: true, // default
+        ssr: {
+          credential: '~/service-account.json',
+          serverLogin: true,
+        }, // default
         emulatorPort: process.env.NODE_ENV === 'development' ? 9099 : null,
         emulatorHost:
           process.env.NODE_ENV === 'development' ? 'http://localhost' : null,
@@ -76,14 +81,14 @@ module.exports = {
               emulatorPort: 8080,
               emulatorHost: 'localhost',
             }
-          : {},
+          : true,
       storage:
         process.env.NODE_ENV === 'development'
           ? {
               emulatorPort: 9199,
               emulatorHost: 'localhost',
             }
-          : {},
+          : true,
     },
   },
 
@@ -137,6 +142,30 @@ module.exports = {
         //   error: colors.deepOrange.accent4,
         //   success: colors.green.accent3,
         // },
+      },
+    },
+  },
+
+  htmlValidator: {
+    usePrettier: false,
+    options: {
+      extends: [
+        'html-validate:document',
+        'html-validate:recommended',
+        'html-validate:standard',
+      ],
+      rules: {
+        'svg-focusable': 'off',
+        'no-unknown-elements': 'error',
+        // Conflicts or not needed as we use prettier formatting
+        'void-style': 'off',
+        'no-trailing-whitespace': 'off',
+        // Conflict with Nuxt defaults
+        'require-sri': 'off',
+        'attribute-boolean-style': 'off',
+        'doctype-style': 'off',
+        // Unreasonable rule
+        'no-inline-style': 'off',
       },
     },
   },

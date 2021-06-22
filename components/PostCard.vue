@@ -1,77 +1,84 @@
 <template>
-  <v-card>
-    <v-skeleton-loader
-      v-if="!$store.state.loaded"
-      type="article"
-    ></v-skeleton-loader>
+  <div>
+    <!-- <v-card v-show="!loaded">
+      <v-skeleton-loader type="article"></v-skeleton-loader>
+    </v-card> -->
 
-    <v-card-title v-if="$store.state.loaded">
-      <v-list-item two-line>
-        <nuxt-link
-          :to="{
-            name: 'profiles-slug',
-            params: { slug: `@${value.profile.slug}` },
-          }"
-        >
-          <v-list-item-avatar color="primary darken-3">
-            <v-img
-              class="elevation-6"
-              :alt="value.profile.displayName"
-              :src="value.profile.photoUrl"
-            ></v-img>
-          </v-list-item-avatar>
-        </nuxt-link>
-
-        <v-list-item-content>
+    <v-card>
+      <v-card-title>
+        <v-list-item two-line>
           <nuxt-link
-            class="text-decoration-none black--text"
             :to="{
               name: 'profiles-slug',
               params: { slug: `@${value.profile.slug}` },
             }"
           >
-            <v-list-item-title class="text-h5">
-              {{ value.profile.displayName }}
-            </v-list-item-title>
+            <v-list-item-avatar color="primary darken-3">
+              <v-img
+                class="elevation-6"
+                :alt="value.profile.displayName"
+                :src="value.profile.photoUrl"
+              ></v-img>
+            </v-list-item-avatar>
           </nuxt-link>
-          <v-list-item-subtitle v-if="value.createdAt != null">
-            {{ $dayjs.unix(value.createdAt.seconds).fromNow() }}
-          </v-list-item-subtitle>
-        </v-list-item-content>
-        <span class="text-h6 font-weight-light">
-          <v-menu offset-y>
-            <template v-slot:activator="{ on, attrs }">
-              <v-btn icon v-bind="attrs" v-on="on">
-                <v-icon>mdi-dots-vertical</v-icon>
-              </v-btn>
-            </template>
-            <v-list>
-              <post-modify-menu-item
-                v-if="user.uid == value.profile.id"
-                :value="value"
-              />
 
-              <v-list-item
-                v-if="user.uid == value.profile.id"
-                link
-                @click="deleteItem"
-              >
-                <v-list-item-title> Supprimer </v-list-item-title>
-              </v-list-item>
+          <v-list-item-content>
+            <nuxt-link
+              class="text-decoration-none black--text"
+              :to="{
+                name: 'profiles-slug',
+                params: { slug: `@${value.profile.slug}` },
+              }"
+            >
+              <v-list-item-title class="text-h5">
+                {{ value.profile.displayName }}
+              </v-list-item-title>
+            </nuxt-link>
+            <v-list-item-subtitle v-if="value.createdAt != null">
+              {{ $dayjs.unix(value.createdAt.seconds).fromNow() }}
+            </v-list-item-subtitle>
+          </v-list-item-content>
+          <div v-if="isAuthenticated" class="text-h6 font-weight-light">
+            <v-menu offset-y>
+              <template v-slot:activator="{ on, attrs }">
+                <v-btn
+                  icon
+                  v-bind="attrs"
+                  v-on="on"
+                  aria-label="options"
+                  :role="`options-${value.id}`"
+                >
+                  <v-icon>mdi-dots-vertical</v-icon>
+                </v-btn>
+              </template>
+              <v-list>
+                <post-modify-menu-item
+                  v-if="user.uid == value.profile.id"
+                  :value="value"
+                />
 
-              <v-list-item link @click="reportItem">
-                <v-list-item-title> Signaler </v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </span>
-      </v-list-item>
-    </v-card-title>
+                <v-list-item
+                  v-if="user.uid == value.profile.id"
+                  link
+                  @click="deleteItem"
+                >
+                  <v-list-item-title> Supprimer </v-list-item-title>
+                </v-list-item>
 
-    <v-card-text v-if="$store.state.loaded">
-      <div class="markdown-body" v-html="$md.render(value.content)"></div>
-    </v-card-text>
-  </v-card>
+                <v-list-item link @click="reportItem">
+                  <v-list-item-title> Signaler </v-list-item-title>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+        </v-list-item>
+      </v-card-title>
+
+      <v-card-text>
+        <div class="markdown-body" v-html="$md.render(value.content)"></div>
+      </v-card-text>
+    </v-card>
+  </div>
 </template>
 
 <script>
@@ -92,6 +99,8 @@ export default {
   computed: {
     ...mapGetters({
       user: AUTH_GETTERS.GET_USER,
+      isAuthenticated: AUTH_GETTERS.IS_AUTHENTICATED,
+      loaded: 'isLoaded',
     }),
   },
   mounted() {

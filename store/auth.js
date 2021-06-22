@@ -1,5 +1,6 @@
 import firebase from 'firebase'
 import { uploadFile } from '~/helpers/functions'
+import { userBuilder } from '~/helpers/user-builder'
 
 export const AUTH = {
   LOGIN_WITH_GITHUB: 'auth/loginWithGithub',
@@ -32,6 +33,7 @@ export const getters = {
 
 export const actions = {
   async loginWithGithub({ dispatch }) {
+    console.log('Connect with github')
     const provider = new firebase.auth.GithubAuthProvider()
 
     try {
@@ -59,22 +61,10 @@ export const actions = {
   },
 
   setUser({ commit, state }, data) {
-    const user = {
-      ...{
-        uid: null,
-        email: null,
-        photoUrl: null,
-        displayName: null,
-        bio: null,
-        followings: [],
-        linkedin: null,
-        github: null,
-        instagram: null,
-        youtube: null,
-      },
+    const user = userBuilder({
       ...state.user,
       ...data,
-    }
+    })
 
     commit('SET_USER', user)
 
@@ -117,15 +107,10 @@ export const actions = {
         youtube,
       })
 
-      this.dispatch(AUTH.SET_USER, {
-        email,
-        displayName,
-        bio,
-        linkedin,
-        github,
-        instagram,
-        youtube,
-      })
+      this.dispatch(
+        AUTH.SET_USER,
+        userBuilder({ ...data, ...{ id: user.uid } })
+      )
     } catch (error) {
       throw new Error(error.message)
     }

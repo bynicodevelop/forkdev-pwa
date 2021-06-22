@@ -31,11 +31,7 @@
             v-model="profile.displayName"
           />
 
-          <v-text-field
-            label="Votre nom de profile"
-            solo
-            v-model="profile.email"
-          />
+          <v-text-field label="Votre email" solo v-model="profile.email" />
 
           <v-textarea
             solo

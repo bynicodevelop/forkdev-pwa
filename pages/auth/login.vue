@@ -11,10 +11,10 @@
           développeurs.
         </p>
       </v-col>
-      <v-col class="blue lighten-4 pt-15 px-10" md="4" align="center">
+      <v-col class="blue lighten-4 pt-15 px-10 text-center" md="4">
         <h2>Connectez-vous</h2>
         <h3 class="mb-10">Avec votre compte Github</h3>
-        <div align="center">
+        <div class="text-center">
           <v-btn class="grey darken-3 white--text" @click="connect">
             <v-icon class="mr-3">mdi-github</v-icon> Connect with github</v-btn
           >

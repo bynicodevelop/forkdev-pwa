@@ -11,6 +11,8 @@ const nuxtConfig = require('./nuxt.config.js')
 
 admin.initializeApp()
 
+const MIGRATE_VERSION = '1.0.0'
+
 const config = {
   ...nuxtConfig,
   dev: false,
@@ -101,6 +103,42 @@ exports.populate = functions.https.onRequest(async (request, response) => {
   response.json('ok')
 })
 
+exports.migrate = functions.https.onRequest(async (request, response) => {
+  const migrationRef = await admin
+    .firestore()
+    .collection('migrations')
+    .doc(MIGRATE_VERSION)
+    .get()
+
+  if (migrationRef.exists) {
+    return response.json(`Migration ${MIGRATE_VERSION} is already updated!`)
+  }
+
+  const userRef = await admin.firestore().collection('users').get()
+
+  userRef.docs.forEach(async (user) => {
+    const postsRef = await admin
+      .firestore()
+      .collection('posts')
+      .where('userId', '==', user.id)
+      .get()
+
+    await user.ref.update({
+      nbPosts: postsRef.docs?.length ?? 0,
+      nbFollowings: user.followings?.length ?? 0,
+      nbFollowers: user.followers?.length ?? 0,
+    })
+  })
+
+  await admin.firestore().collection('migrations').doc(MIGRATE_VERSION).set({
+    migrateAt: admin.firestore.FieldValue.serverTimestamp(),
+    description:
+      'Mise à jour des compteurs pour les posts, followers et followings',
+  })
+
+  return response.json(`Migration ${MIGRATE_VERSION} updated!`)
+})
+
 exports.onUserCreated = functions.auth.user().onCreate(async (user) => {
   const { email, uid, displayName, photoURL } = user
 
@@ -152,9 +190,14 @@ exports.onUserFollow = functions.firestore
       listFollowings.forEach(async (followerId) => {
         await userRefence.doc(followerId).update({
           followers: admin.firestore.FieldValue.arrayUnion(userId),
+          nbFollowers: admin.firestore.FieldValue.increment(1),
         })
       })
-    } else {
+
+      await userRefence.doc(userId).update({
+        nbFollowings: admin.firestore.FieldValue.increment(1),
+      })
+    } else if (newValue.followings.length < previousValue.followings.length) {
       console.log('Following removed')
 
       const listFollowings = _.differenceWith(
@@ -166,7 +209,12 @@ exports.onUserFollow = functions.firestore
       listFollowings.forEach(async (followerId) => {
         await userRefence.doc(followerId).update({
           followers: admin.firestore.FieldValue.arrayRemove(userId),
+          nbFollowers: admin.firestore.FieldValue.increment(-1),
         })
+      })
+
+      await userRefence.doc(userId).update({
+        nbFollowings: admin.firestore.FieldValue.increment(-1),
       })
     }
   })
@@ -174,24 +222,27 @@ exports.onUserFollow = functions.firestore
 exports.onPostCreated = functions.firestore
   .document('posts/{postId}')
   .onCreate(async (snap, context) => {
-    const { postId } = context.params
     const { userId } = snap.data()
 
-    const userRef = await admin
+    await admin
       .firestore()
       .collection('users')
       .doc(userId)
-      .get()
+      .update({
+        nbPosts: admin.firestore.FieldValue.increment(1),
+      })
+  })
 
-    const { followers } = userRef.data()
+exports.onPostDeleted = functions.firestore
+  .document('posts/{postId}')
+  .onDelete(async (snap, context) => {
+    const { userId } = snap.data()
 
-    followers.forEach(async (follower) => {
-      await admin
-        .firestore()
-        .collection('users')
-        .doc(follower)
-        .collection('feed')
-        .doc(postId)
-        .set(snap.data())
-    })
+    await admin
+      .firestore()
+      .collection('users')
+      .doc(userId)
+      .update({
+        nbPosts: admin.firestore.FieldValue.increment(-1),
+      })
   })

@@ -21,6 +21,7 @@
         v-if="isAuthenticated"
         icon
         link
+        aria-label="Search"
         :to="{ name: 'search' }"
       >
         <v-icon>mdi-magnify</v-icon>
@@ -31,9 +32,21 @@
         v-if="isAuthenticated"
         icon
         link
+        aria-label="Settings"
         :to="{ name: 'settings' }"
       >
         <v-icon>mdi-dots-vertical</v-icon>
+      </v-btn>
+
+      <v-btn
+        active-class="no-active"
+        v-if="!isAuthenticated"
+        link
+        text
+        aria-label="Connexion"
+        :to="{ name: 'auth-login' }"
+      >
+        Se connecter
       </v-btn>
     </v-app-bar>
     <v-main>

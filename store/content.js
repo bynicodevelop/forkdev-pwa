@@ -1,5 +1,6 @@
 import { firestoreAction } from 'vuexfire'
 import firebase from 'firebase'
+import { userBuilder } from '~/helpers/user-builder'
 
 export const CONTENT = {
   GET: 'content/get',
@@ -29,7 +30,7 @@ export const mutations = {
 }
 
 export const actions = {
-  async get({ commit, rootState }, options) {
+  async get({ commit, rootState }) {
     let posts = []
 
     const userIds = [
@@ -133,13 +134,13 @@ export const actions = {
     let ref = this.$fire.firestore
       .collection('posts')
       .orderBy('createdAt', 'desc')
-      .where('userId', '==', profile.id)
+      .where('userId', '==', profile.uid)
 
     await bindFirestoreRef('profileContents', ref, {
       serialize: (doc) => {
         return {
           id: doc.id,
-          profile,
+          ...{ profile: userBuilder(profile) },
           ...doc.data(),
         }
       },

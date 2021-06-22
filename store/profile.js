@@ -1,6 +1,8 @@
 import { firestoreAction } from 'vuexfire'
 import firebase from 'firebase'
 import { AUTH } from './auth'
+import { userBuilder } from '~/helpers/user-builder'
+import { CONTENT } from './content'
 
 export const PROFILE = {
   GET: 'profile/get',
@@ -38,10 +40,10 @@ export const actions = {
 
     await bindFirestoreRef('profiles', ref, {
       serialize: (doc) => {
-        return {
-          id: doc.id,
+        return userBuilder({
+          uid: doc.id,
           ...doc.data(),
-        }
+        })
       },
     })
   }),
@@ -59,35 +61,20 @@ export const actions = {
       throw new Error('User not found')
     }
 
-    const {
-      displayName,
-      slug,
-      photoUrl,
-      bio,
-      linkedin,
-      github,
-      instagram,
-      youtube,
-    } = ref.docs[0].data()
-
-    commit('SET_PROFILE', {
-      displayName,
-      slug,
-      photoUrl: photoUrl ?? '',
-      id: ref.docs[0].id,
-      bio: bio ?? '',
-      linkedin: linkedin ?? '',
-      github: github ?? '',
-      instagram: instagram ?? '',
-      youtube: youtube ?? '',
+    const profile = userBuilder({
+      ...ref.docs[0].data(),
+      ...{ uid: ref.docs[0].id },
     })
+
+    commit('SET_PROFILE', profile)
+
+    await this.dispatch(CONTENT.GET_BY_USER_ID, { profile })
   },
 
   async follow({ rootState, dispatch }, options) {
-    const { id } = options.profile
     const { uid, followings } = rootState.auth.user
 
-    const isFollowed = followings.includes(id)
+    const isFollowed = followings.includes(options.profile.uid)
 
     try {
       await this.$fire.firestore
@@ -95,24 +82,28 @@ export const actions = {
         .doc(uid)
         .update({
           followings: isFollowed
-            ? firebase.firestore.FieldValue.arrayRemove(id)
-            : firebase.firestore.FieldValue.arrayUnion(id),
+            ? firebase.firestore.FieldValue.arrayRemove(options.profile.uid)
+            : firebase.firestore.FieldValue.arrayUnion(options.profile.uid),
         })
 
       let followingUpdated = [...followings]
 
       if (isFollowed) {
-        const index = followingUpdated.indexOf(id)
+        const index = followingUpdated.indexOf(options.profile.uid)
 
         if (index > -1) {
           followingUpdated.splice(index, 1)
         }
       } else {
-        followingUpdated = [...followings, ...[id]]
+        followingUpdated = [...followings, ...[options.profile.uid]]
       }
 
-      this.dispatch(AUTH.UPDATE_FOLLOWINGS, {
+      await this.dispatch(AUTH.UPDATE_FOLLOWINGS, {
         followings: followingUpdated,
+      })
+
+      await this.dispatch(PROFILE.GET_BY_SLUG, {
+        profileSlug: options.profile.slug,
       })
 
       dispatch('isFollowed', options)
@@ -122,10 +113,10 @@ export const actions = {
   },
 
   async isFollowed({ commit, rootState }, options) {
-    const { id } = options.profile
+    const { uid } = options.profile
     const { followings } = rootState.auth.user
 
-    const isFollowed = followings.includes(id)
+    const isFollowed = followings.includes(uid)
 
     commit('SET_FOLLOW_STATE', isFollowed)
   },

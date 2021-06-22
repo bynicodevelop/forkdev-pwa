@@ -9,7 +9,7 @@
       </client-only>
     </v-card-text>
 
-    <v-card-actions align="end">
+    <v-card-actions class="text-end">
       <v-spacer></v-spacer>
       <v-btn v-if="!isUpdatePostEditor" text @click="create"> Poster </v-btn>
       <v-btn v-if="isUpdatePostEditor" text @click="$emit('cancel')">

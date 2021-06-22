@@ -2,7 +2,7 @@
   "functions": {
     "source": "functions",
     "predeploy": [
-      "rm -rf functions/node_modules && rm -rf node_modules && rm -rf functions/.nuxt && rm .env && rm functions/.env functions/nuxt.config.js && cp .env-prod .env && npm i && npm run build && npm --prefix functions/ i && mkdir -p functions/.nuxt/dist && cp -r .nuxt/dist/ functions/.nuxt/dist && cp nuxt.config.js functions/ && cp .env functions/.env"
+      "rm -rf functions/node_modules node_modules functions/.nuxt && rm functions/service-account.json functions/.env functions/nuxt.config.js && cp .env-prod .env && npm i && npm run build && npm --prefix functions/ i && mkdir -p functions/.nuxt/dist && cp -r .nuxt/dist/ functions/.nuxt/dist && cp nuxt.config.js functions/ && cp .env functions/ && cp service-account.json functions/"
     ]
   },
   "firestore": {
@@ -48,5 +48,6 @@
     "ui": {
       "enabled": true
     }
-  }
+  },
+  "other": "cp .env-prod .env && npm run build && cp -r .nuxt/dist/ functions/.nuxt/dist && cp nuxt.config.js functions/ && cp .env functions/ && cp service-account.json functions/ && cp -r functions/.nuxt/dist/client/ public/nuxt && cp -a static/. public/"
 }

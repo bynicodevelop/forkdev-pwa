@@ -1,7 +1,10 @@
 <template>
   <v-row>
     <v-col offset-md="3" md="6">
-      <v-list two-line>
+      <p class="text-center ma-10" v-if="profiles.length == 0">
+        Aucun résultat pour cette rechercher
+      </p>
+      <v-list two-line v-if="profiles.length > 0">
         <v-list-item-group>
           <v-list-item
             v-for="(profile, i) in profiles"

@@ -18,6 +18,7 @@ import 'prismjs/components/prism-c.js'
 import 'prismjs/components/prism-cpp.js'
 import 'prismjs/components/prism-csharp.js'
 import 'prismjs/components/prism-css.js'
+import 'prismjs/components/prism-bash.js'
 
 // Set vue SFC to markdown
 Prism.languages.vue = Prism.languages.markup

@@ -1,5 +1,5 @@
 <template>
-  <v-btn v-if="user.uid != profile.id" color="primary" @click="follow">
+  <v-btn v-if="user.uid != profile.uid" color="primary" @click="follow">
     <v-icon class="mr-3">mdi-source-fork mdi-rotate-90</v-icon>
     {{ isFollow ? 'Ne plus suivre' : 'Suivre' }}
   </v-btn>
@@ -21,6 +21,7 @@ export default {
     ...mapGetters({
       isFollow: PROFILE_GETTERS.IS_FOLLOWED,
       user: AUTH_GETTERS.GET_USER,
+      isAuthenticated: AUTH_GETTERS.IS_AUTHENTICATED,
     }),
   },
   mounted() {
@@ -28,6 +29,12 @@ export default {
   },
   methods: {
     async follow() {
+      if (!this.isAuthenticated) {
+        this.$router.push({ name: 'auth-login' })
+
+        return
+      }
+
       await this.$store.dispatch(PROFILE.FOLLOW, { profile: this.profile })
     },
   },
